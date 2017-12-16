@@ -1,0 +1,125 @@
+<head>
+        <meta name="google-signin-client_id" 
+        content="611783593373-l14a7l3a43qe3621u5tlkpqou1vj4if1.apps.googleusercontent.com">
+</head>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+<style>
+    .img-thumbnail{
+   width:100px;
+   height:100px;
+}
+</style>
+
+<div class="jumbotron text-center">
+    <h1>
+        Nightlife Coordination App
+    </h1>
+</div>
+<div class="row">
+    <div class="col-lg-3">
+    </div>
+    <div class="col-lg-6">
+        <div class="input-group">
+            <input class="form-control" placeholder="Place to go..." type="text" id="text"> 
+            <button class="btn btn-outline-info btn-sm"  type="submit" id="click"> Search</button>
+            <div class="g-signin2 btn btn-sm" data-onsuccess="onSignIn" align="center" >
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<div id="display" style="margin-top: 50px"> 
+<!-- This is a template for search result -->
+    <div class="row" style="display: none">
+        <div class="col-lg-3 text-right" style="width:250px; height:250px;">
+            <img src="https://media.timeout.com/images/100519023/image.jpg" class="img-thumbnail">
+        </div>
+        <div class="col-lg-6 text-left">
+            <h3> Bar Coffee </h3>
+            <p> Text holder</p>
+            <p> 2 people ongoing</p>
+        </div>
+        <div>
+            <button class="btn btn-outline-danger"> Going </button>
+        </div>
+    </div>
+<!-- Search Result Come Here -->
+</div>
+
+
+<script>
+    var username;
+    window.onload = function auto () {
+        setTimeout(function(){
+            if(username) {
+                $.ajax({
+                    type: "POST",
+                    url: "/",
+                    data: {username: username},
+                    dataType: "json",
+                    success: function (res) {
+                        if(res) {
+                            $("#text").val(res.last);
+                            search();
+                        }
+                    }
+                })
+            }
+        },1500);
+    };
+    function search () {
+        $("#display").empty();
+        $.ajax({
+            type: "POST",
+            url: "/search",
+            data: {location: $("#text").val(), username: username},
+            dataType: "json",
+            success: function (res) {
+                for(var i = 0; i < res.length; i++) {
+                    var state = res[i].state ? "Un going" : "Going";
+                    var div = "<div class='row'>" + "<div class='col-lg-3 text-right' style='width:250px; height:250px;'>" + "<img src='" + res[i].url + "' class='img-thumbnail'>" + "</div>" + "<div class='col-lg-6 text-left'>"
+                    + "<h3>" + res[i].bar + "</h3>" + "<p>" + res[i].barState + "</p>" + "<p>" + res[i].value +" people going </p>" + "</div>" + "<div>" + "<button class='btn btn-outline-danger'" + 'value="' + res[i].bar   +'">'  + state + "</button>" + 
+                    "</div> </div>";
+                    console.log(div); 
+                    $("#display").append(div);
+                }
+            }
+        })
+    }
+    
+    $("#click").on("click", function(){
+        if( $("#text").val() === "") return false;
+        search();
+        
+    })
+    $("#display").on("click", function(){
+        var bar = $(event.target).attr("value");
+        if(!username) return alert("Sign-in to use");
+        if (bar === undefined) return false;
+        else {
+            $.ajax({
+                type: "POST",
+                url: "/update",
+                data: {bar: bar, username: username},
+                dataType: "json",
+            })
+        }
+       
+    })
+
+    function onSignIn(googleUser) {
+        var profile = googleUser.getBasicProfile();
+        username = profile.getEmail();
+    /*
+        console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+        console.log('Name: ' + profile.getName());
+        console.log('Image URL: ' + profile.getImageUrl());
+        console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+    */
+}
+
+</script>
