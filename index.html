@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://apis.google.com/js/platform.js" async defer></script>
+
 <style>
     .img-thumbnail{
    width:100px;
@@ -50,6 +51,24 @@
 <!-- Search Result Come Here -->
 </div>
 
+<nav class="navbar fixed-bottom navbar-light bg-faded">
+    <div class="row">
+        <div class="text-left col-lg-4">
+            <a class="navbar-brand"> Design by Yukixoma</a>
+            <br>
+            <a href="https://github.com/yukixoma" target="_blank"> Github </a>
+        </div>
+        <div class="col-lg-4 text-center">
+            <br>
+            <a href="https://www.yelp.com/developers/documentation/v3/get_started" target="_blank"> Thanks Yelp for API </a>
+        </div>
+        <div class="text-right col-lg-4">
+            Server: NODEJS
+            <br>
+            Client: Bootstrap, Jquery
+        </div>
+    </div>
+</nav>
 
 <script>
     var username;
@@ -71,6 +90,13 @@
             }
         },1500);
     };
+
+    $(document).keypress(function(e) {
+        if(e.which == 13) {
+            if($("#text").val() != "") search ();
+        }
+    });
+
     function search () {
         $("#display").empty();
         $.ajax({
